@@ -26,7 +26,7 @@
             document.getElementById("r_name").value ? data.name = document.getElementById("r_name").value : null;
             document.getElementById("r_desc").value ? data.description = document.getElementById("r_desc").value : null;
             document.getElementById("r_dir").value ? data.directions = document.getElementById("r_dir").value : null;
-            document.getElementById("r_prep_time").value ? data.prep_time = document.getElementById("i_name").value : null;
+            document.getElementById("r_prep_time").value ? data.prep_time = document.getElementById("r_prep_time").value : null;
             if(id){
                 var url = '/' + p_id + '/recipes/' + r_id;
                 request('PATCH', url, JSON.stringify(data));
