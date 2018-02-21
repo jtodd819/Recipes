@@ -1,9 +1,5 @@
 A recipe tracker built on a REST API with Google OAuth 2.0 configured to access Google account information.
 
-Available at  
-https://myrecipes-194614.appspot.com
-
-
 I used the Google People API to allow a user to login to their Google Account to access their display name, photo, and people resource id. The people resource id is used in the routes below to access recipes and ingredients tied to their account as the value p_id. Any requests made to create/edit/delete/view recipes or ingredients requires the user to be authenticated for the requested pid or for the pid to equal 1, the hard-coded testing account.
 
 Routes
