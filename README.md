@@ -1,4 +1,4 @@
-A recipe tracker built on a REST API with Google OAuth 2.0 configured to access Google acccount information.
+A recipe tracker built on a REST API with Google OAuth 2.0 configured to access Google account information.
 
 Available at  
 https://myrecipes-194614.appspot.com
