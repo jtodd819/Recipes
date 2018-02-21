@@ -1,0 +1,143 @@
+<html>
+  <head>
+    <title>My Recipes</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/4.0.0-beta.3/slate/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <script>
+        var p_id = window.location.pathname.split('/')[1];
+        //client method for sending patch and post requests
+        function request(method, url, data){
+            var xhr = new XMLHttpRequest();
+            xhr.open(method, url, true);
+            xhr.setRequestHeader("Content-type", "application/json")
+            xhr.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    setTimeout(function(){ window.location.reload(true); }, 500);
+                }
+            }
+            xhr.send(data);
+        };
+
+        //handler for editing or posting new recipes
+        function submitRecipe(e){
+            e.preventDefault();
+            var data = {};
+            var id = document.getElementById("r_id").value
+            document.getElementById("r_name").value ? data.name = document.getElementById("r_name").value : null;
+            document.getElementById("r_desc").value ? data.description = document.getElementById("r_desc").value : null;
+            document.getElementById("r_dir").value ? data.directions = document.getElementById("r_dir").value : null;
+            document.getElementById("r_prep_time").value ? data.prep_time = document.getElementById("i_name").value : null;
+            if(id){
+                var url = '/' + p_id + '/recipes/' + r_id;
+                request('PATCH', url, JSON.stringify(data));
+            }else{
+                document.getElementById("r_i_ids").value ? data.ingredient_ids = document.getElementById("r_i_ids").value.split(" ") : null;
+                var url = '/' + p_id + '/recipes';
+                request('POST', url, JSON.stringify(data));
+            }
+        };
+
+        //handler for editing or posting new Ingredients
+        function submitIngredient(e){
+            e.preventDefault();
+            var data = {};
+            var id = document.getElementById("i_id").value
+            document.getElementById("i_name").value ? data.name = document.getElementById("i_name").value : null;
+            document.getElementById("i_unit").value ? data.unit = document.getElementById("i_unit").value : null;
+            document.getElementById("i_r_id").value ? data.recipe_id = parseInt(document.getElementById("i_r_id").value, 10) : null;
+            document.getElementById("i_quantity").value ? data.quantity = parseInt(document.getElementById("i_quantity").value, 10) : null;
+            if(id){
+                var url = '/' + p_id + '/ingredients/' + id;
+                request('PATCH', url, JSON.stringify(data));
+            }else{
+                var url = '/' + p_id + '/ingredients';
+                request('POST', url, JSON.stringify(data));
+            }
+        };
+        //function for deleting recipes or ingredients
+        function remove(e, type, id){
+            e.preventDefault();
+            var xhr = new XMLHttpRequest();
+            var url = '/' + p_id + '/recipes/' + id
+            if(type === 'ingredient'){
+                url = '/' + p_id + '/ingredients/' + id
+            }
+            xhr.open('DELETE', url, true);
+            xhr.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    setTimeout(function(){ window.location.reload(true); }, 500);
+                }
+            }
+            xhr.send(null);
+        };
+    </script>
+  </head>
+  <body>
+    <h1>My Recipes</h1><br/>
+    <h2>{{display_name}}<img src="{{user_photo}}" alt="" height="50" width="50"></h2><br/>
+    <h2>Recipes</h2><br/>
+    <table id='recipe_table'>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Ingredients</th>
+            <th>Directions</th>
+            <th>Prep Time</th>
+        </tr>
+        {% for recipe in recipes %}
+        <tr>
+            <td>{{recipe['id']}} <button onclick="remove(event, 'recipe', {{recipe['id']}})">Delete</button></td>
+            <td>{{recipe['name']}}</td>
+            <td>{{recipe['description']}}</td>
+            <td>
+                <ul>
+                {% for ing in recipe['ingredients'] %}
+                    <li>{{ing['info']}}<button onclick="remove(event, 'ingredient', {{ing['id']}})">Delete</button></li>
+                {% endfor %}
+                </ul>
+            </td>
+            <td>{{recipe['directions']}}</td>
+            <td>{{recipe['prep_time']}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div>
+        <h3>Create or Edit a Recipe</h3>
+        <h4>Required values for creation: Name, Directions, Prep Time; editing: ID, <br>
+            one or more of: Name, Description, Directions, Prep Time</h4>
+        <form>
+            ID:<br/>
+            <input type='text' id='r_id'><br/>
+            Name:<br/>
+            <input type='text' id='r_name'><br/>
+            Description:<br/>
+            <input type='text' id='r_desc'><br/>
+            Ingredient IDs(space separated list of ids, can only be used for creation):<br/>
+            <input type='text' id='r_i_ids'><br/>
+            Directions:<br/>
+            <input type='text' id='r_dir'><br/>
+            Prep Time:<br/>
+            <input type='text' id='r_prep_time'><br/>
+            <button onclick='submitRecipe(event)'>Submit</button>
+        </form>
+        <h3>Create or Edit an Ingredient</h3>
+        <h4>Required values for creation: Name, Quantity, Recipe; editing: ID, one or more of: Name, Quantity, <br>
+            Unit, Recipe ID.</h4>
+        <form>
+            ID:<br/>
+            <input type='text' id='i_id'><br/>
+            Name:<br/>
+            <input type='text' id='i_name'><br/>
+            Quantity:<br/>
+            <input type='number' id='i_quantity'><br/>
+            Unit:<br/>
+            <input type='text' id='i_unit'><br/>
+            Recipe ID:
+            <input type='number' id='i_r_id'><br/>
+            <button onclick='submitIngredient(event)'>Submit</button>
+        </form>
+    </div>
+    <a href='/'>Sign Out</a>
+  </body>
+</html>
